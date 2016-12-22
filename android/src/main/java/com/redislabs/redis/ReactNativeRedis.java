@@ -122,6 +122,8 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
             int topicId = topic.addListener(TopicListener.create());
 
             topicListeners.put(topicName, topicId);
+            callback.invoke(true);
+            return;
         }
 
         _raiseNotInitialized(callback);
@@ -134,6 +136,8 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
             if (listenerId != null) {
                 RTopic<ReadableMap> topic = redisson.getTopic(topicName);
                 topic.removeListener(listenerId);
+                callback.invoke(true);
+                return;
             }
         }
 

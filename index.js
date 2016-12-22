@@ -22,7 +22,7 @@ switch (Platform.OS) {
     case 'android':
         bridge = ReactNativeRedisAndroid;
         DeviceEventEmitter.addListener('receivedNotification', (notification) => {
-            // ...
+            call_notification_listeners(notification);
         });
         break;
 }
@@ -30,8 +30,67 @@ switch (Platform.OS) {
 
 export class Redis {
 
-    static on_notification(callback) {
-        notification_listeners.push(callback);
+    static connect(config) {
+        return new Promise((resolve, reject) => {
+            bridge.init(config, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result)
+            })
+        });
     }
 
+    static readObject(key) {
+        return new Promise((resolve, reject) => {
+            bridge.readObject(key, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result)
+            })
+        });
+    }
+
+    static saveObject(key, obj) {
+        return new Promise((resolve, reject) => {
+            bridge.saveObject(key, obj, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result)
+            })
+        });
+    }
+
+    static subscribe(topic) {
+        return new Promise((resolve, reject) => {
+            bridge.subscribe(topic, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result)
+            })
+        });
+    }
+
+    static unsubscribe(topic) {
+        return new Promise((resolve, reject) => {
+            bridge.unsubscribe(topic, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result)
+            })
+        });
+    }
+
+    static onNotification(callback) {
+        notification_listeners.push(callback);
+    }
 }
