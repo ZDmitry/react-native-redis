@@ -2,25 +2,29 @@ package com.redislabs.redis;
 
 import java.lang.String;
 
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
-import org.redisson.api.listener.MessageListener;
+import org.redisson.api.listener.PatternMessageListener;
 
 
 class TopicListener {
 
-    static MessageListener<ReadableMap> create() {
-        return (new MessageListener<ReadableMap> () {
+    static PatternMessageListener<String> create() {
+        return (new PatternMessageListener<String> () {
             @Override
-            public void onMessage(String channel, ReadableMap msg) {
+            public void onMessage(String pattern, String channel, String msg) {
                 EventEmitter emitter = EventEmitter.getInstance();
 
-                WritableMap obj = new WritableNativeMap();
-                obj.merge(msg);
+                WritableMap eventMap = new WritableNativeMap();
+                eventMap.putString("event", channel);
+                eventMap.putString("pattern", pattern);
+                eventMap.putString("message", msg);
 
-                emitter.emit(channel, obj);
+                WritableMap returnMap = new WritableNativeMap();
+                returnMap.putMap("result", eventMap);
+
+                emitter.emit("redis.event", returnMap);
             }
         });
     }

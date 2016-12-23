@@ -13,11 +13,11 @@ import com.facebook.react.bridge.Callback;
 
 import org.json.JSONObject;
 import org.redisson.Redisson;
-import org.redisson.config.Config;
-
-import org.redisson.api.RedissonClient;
 import org.redisson.api.RBucket;
-import org.redisson.api.RTopic;
+import org.redisson.api.RedissonClient;
+import org.redisson.api.RPatternTopic;
+import org.redisson.api.listener.PatternMessageListener;
+import org.redisson.config.Config;
 
 
 class ReactNativeRedis extends ReactContextBaseJavaModule {
@@ -27,6 +27,60 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     ReactNativeRedis(final ReactApplicationContext reactContext) {
         super(reactContext);
+    }
+
+    Boolean _init(final ReadableMap config) throws Exception {
+        JSONObject jsonConfig = ReactNativeUtils.convertMapToJson(config);
+        String strConfig = jsonConfig.toString();
+
+        redisson = Redisson.create(Config.fromJSON(strConfig));
+        return true;
+    }
+
+    <T> Object _getBucket(final String key) throws Exception {
+        if (redisson == null) {
+            throw new Exception("Redis client not initialized");
+        }
+
+        RBucket<T> bucket = redisson.getBucket(key);
+        return bucket.get();
+    }
+
+    <T> Boolean _setBucket(final String key, final T obj) throws Exception {
+        if (redisson == null) {
+            throw new Exception("Redis client not initialized");
+        }
+
+        RBucket<T> bucket = redisson.getBucket(key);
+        return bucket.trySet(obj);
+    }
+
+    <T> Boolean _topicSubscribe(final String topicName, final PatternMessageListener<T> listener) throws Exception {
+        if (redisson == null) {
+            throw new Exception("Redis client not initialized");
+        }
+
+        Integer listenerId = topicListeners.get(topicName);
+
+        RPatternTopic<T> topic = redisson.getPatternTopic(topicName);
+        int topicId = topic.addListener(listener);
+
+        topicListeners.put(topicName, topicId);
+        return true;
+    }
+
+    <T> Boolean _topicUnsubscribe(final String topicName) throws Exception {
+        if (ReactNativeRedis.this.redisson == null) {
+            throw new Exception("Redis client not initialized");
+        }
+
+        Integer listenerId = topicListeners.get(topicName);
+        if (listenerId != null) {
+            RPatternTopic<String> topic = redisson.getPatternTopic(topicName);
+            topic.removeListener(listenerId);
+        }
+
+        return true;
     }
 
     @Override
@@ -39,10 +93,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                JSONObject jsonConfig = ReactNativeUtils.convertMapToJson(config);
-                String strConfig = jsonConfig.toString();
-
-                ReactNativeRedis.this.redisson = Redisson.create(Config.fromJSON(strConfig));
+                ReactNativeRedis.this._init(config);
                 return this._successResult(true);
             }
         }).start();
@@ -53,28 +104,17 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                if (ReactNativeRedis.this.redisson == null) {
-                    throw new Exception("Redis client not initialized");
-                }
-
-                RBucket<ReadableMap> bucket = ReactNativeRedis.this.redisson.getBucket(key);
-                return bucket.get();
+                return ReactNativeRedis.this._getBucket(key);
             }
         }).start();
     }
 
     @ReactMethod
-    public void saveObject(final String key, final ReadableMap obj, Callback callback) {
+    public void saveObject(final String key, final String jsonObj, Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                if (ReactNativeRedis.this.redisson == null) {
-                    throw new Exception("Redis client not initialized");
-                }
-
-                RBucket<ReadableMap> bucket = ReactNativeRedis.this.redisson.getBucket(key);
-                Boolean success = bucket.trySet(obj);
-
+                Boolean success = ReactNativeRedis.this._setBucket(key, jsonObj);
                 return this._successResult(success);
             }
         }).start();
@@ -85,17 +125,8 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                if (ReactNativeRedis.this.redisson == null) {
-                    throw new Exception("Redis client not initialized");
-                }
-
-                Integer listenerId = ReactNativeRedis.this.topicListeners.get(topicName);
-
-                RTopic<ReadableMap> topic = ReactNativeRedis.this.redisson.getTopic(topicName);
-                int topicId = topic.addListener(TopicListener.create());
-
-                ReactNativeRedis.this.topicListeners.put(topicName, topicId);
-                return this._successResult(true);
+                Boolean success = ReactNativeRedis.this._topicSubscribe(topicName, TopicListener.create());
+                return this._successResult(success);
             }
         }).start();
     }
@@ -105,17 +136,8 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                if (ReactNativeRedis.this.redisson == null) {
-                    throw new Exception("Redis client not initialized");
-                }
-
-                Integer listenerId = topicListeners.get(topicName);
-                if (listenerId != null) {
-                    RTopic<ReadableMap> topic = redisson.getTopic(topicName);
-                    topic.removeListener(listenerId);
-                }
-
-                return this._successResult(true);
+                Boolean success = ReactNativeRedis.this.<String>_topicUnsubscribe(topicName);
+                return this._successResult(success);
             }
         }).start();
     }

@@ -21,7 +21,7 @@ let call_notification_listeners = function (notification) {
 switch (Platform.OS) {
   case 'android':
     bridge = ReactNativeRedisAndroid;
-    DeviceEventEmitter.addListener('receivedNotification', (notification) => {
+    DeviceEventEmitter.addListener('redis.event', (notification) => {
       call_notification_listeners(notification);
     });
     break;
@@ -32,7 +32,7 @@ export class Redis {
 
   static connect(config) {
     return new Promise((resolve, reject) => {
-      bridge.init(config, answ => {
+      bridge.init(JSON.stringify(config || '{}'), answ => {
         if (answ.error) {
           reject(answ.error);
           return;
@@ -49,14 +49,14 @@ export class Redis {
           reject(answ.error);
           return;
         }
-        resolve(answ.result)
+        resolve(JSON.parse(answ.result || "null"))
       })
     });
   }
 
   static saveObject(key, obj) {
     return new Promise((resolve, reject) => {
-      bridge.saveObject(key, obj, answ => {
+      bridge.saveObject(key, JSON.stringify(obj || '{}'), answ => {
         if (answ.error) {
           reject(answ.error);
           return;
