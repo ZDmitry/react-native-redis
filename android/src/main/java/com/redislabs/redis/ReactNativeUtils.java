@@ -3,6 +3,9 @@ package com.redislabs.redis;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,5 +67,32 @@ class ReactNativeUtils {
             }
         }
         return array;
+    }
+
+    static WritableMap writableMapFromObject(String key, Object obj) {
+        WritableMap retval = Arguments.createMap();
+
+        if (obj == null) {
+            retval.putNull(key);
+            return retval;
+        }
+
+        if (obj instanceof String) {
+            retval.putString(key, (String)obj);
+        } else if (obj instanceof Double) {
+            retval.putDouble(key, (Double)obj);
+        } else if (obj instanceof Boolean) {
+            retval.putBoolean(key, (Boolean)obj);
+        } else if (obj instanceof Integer) {
+            retval.putInt(key, (Integer)obj);
+        } else if (obj instanceof WritableMap) {
+            retval.putMap(key, (WritableMap)obj);
+        } else if (obj instanceof WritableArray) {
+            retval.putArray(key, (WritableArray)obj);
+        } else {
+            retval.putNull(key);
+        }
+
+        return retval;
     }
 }
