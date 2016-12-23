@@ -1,5 +1,7 @@
 package com.redislabs.redis;
 
+import android.util.Log;
+
 import java.lang.String;
 
 import com.facebook.react.bridge.WritableMap;
@@ -10,8 +12,9 @@ import org.redisson.api.listener.PatternMessageListener;
 
 class TopicListener {
 
-    static PatternMessageListener<String> create() {
+    static PatternMessageListener create() {
         return (new PatternMessageListener<String> () {
+
             @Override
             public void onMessage(String pattern, String channel, String msg) {
                 EventEmitter emitter = EventEmitter.getInstance();

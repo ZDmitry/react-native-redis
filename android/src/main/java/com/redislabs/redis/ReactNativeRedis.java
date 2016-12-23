@@ -13,6 +13,7 @@ import com.facebook.react.bridge.Callback;
 
 import org.json.JSONObject;
 import org.redisson.Redisson;
+import org.redisson.client.codec.StringCodec;
 import org.redisson.config.Config;
 
 import org.redisson.api.RBucket;
@@ -31,11 +32,10 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         super(reactContext);
     }
 
-    private Boolean _init(final ReadableMap config) throws Exception {
-        JSONObject jsonConfig = ReactNativeUtils.convertMapToJson(config);
-        String strConfig = jsonConfig.toString();
-
-        redisson = Redisson.create(Config.fromJSON(strConfig));
+    private Boolean _init(final String jsonConfig) throws Exception {
+        Config config = Config.fromJSON(jsonConfig);
+        config.setCodec(new StringCodec());
+        redisson = Redisson.create(config);
         return true;
     }
 
@@ -94,7 +94,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     @ReactMethod
     @SuppressWarnings("unused")
-    public void init(final ReadableMap config, Callback callback) {
+    public void init(final String config, Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
