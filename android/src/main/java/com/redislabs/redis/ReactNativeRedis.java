@@ -13,11 +13,13 @@ import com.facebook.react.bridge.Callback;
 
 import org.json.JSONObject;
 import org.redisson.Redisson;
+import org.redisson.config.Config;
+
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.RPatternTopic;
+
 import org.redisson.api.listener.PatternMessageListener;
-import org.redisson.config.Config;
 
 
 class ReactNativeRedis extends ReactContextBaseJavaModule {
@@ -29,7 +31,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         super(reactContext);
     }
 
-    Boolean _init(final ReadableMap config) throws Exception {
+    private Boolean _init(final ReadableMap config) throws Exception {
         JSONObject jsonConfig = ReactNativeUtils.convertMapToJson(config);
         String strConfig = jsonConfig.toString();
 
@@ -37,7 +39,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         return true;
     }
 
-    <T> Object _getBucket(final String key) throws Exception {
+    private <T> Object _getBucket(final String key) throws Exception {
         if (redisson == null) {
             throw new Exception("Redis client not initialized");
         }
@@ -46,7 +48,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         return bucket.get();
     }
 
-    <T> Boolean _setBucket(final String key, final T obj) throws Exception {
+    private <T> Boolean _setBucket(final String key, final T obj) throws Exception {
         if (redisson == null) {
             throw new Exception("Redis client not initialized");
         }
@@ -55,7 +57,8 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         return bucket.trySet(obj);
     }
 
-    <T> Boolean _topicSubscribe(final String topicName, final PatternMessageListener<T> listener) throws Exception {
+    @SuppressWarnings("unused")
+    private <T> Boolean _topicSubscribe(final String topicName, final PatternMessageListener<T> listener) throws Exception {
         if (redisson == null) {
             throw new Exception("Redis client not initialized");
         }
@@ -69,7 +72,8 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
         return true;
     }
 
-    <T> Boolean _topicUnsubscribe(final String topicName) throws Exception {
+    @SuppressWarnings("unused")
+    private <T> Boolean _topicUnsubscribe(final String topicName) throws Exception {
         if (ReactNativeRedis.this.redisson == null) {
             throw new Exception("Redis client not initialized");
         }
@@ -89,6 +93,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    @SuppressWarnings("unused")
     public void init(final ReadableMap config, Callback callback) {
         (new ReactTask(callback) {
             @Override
@@ -100,6 +105,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    @SuppressWarnings("unused")
     public void readObject(final String key, Callback callback) {
         (new ReactTask(callback) {
             @Override
@@ -110,6 +116,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    @SuppressWarnings("unused")
     public void saveObject(final String key, final String jsonObj, Callback callback) {
         (new ReactTask(callback) {
             @Override
@@ -121,6 +128,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    @SuppressWarnings("unused")
     public void subscribe(final String topicName, Callback callback) {
         (new ReactTask(callback) {
             @Override
@@ -132,6 +140,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    @SuppressWarnings("unused")
     public void unsubscribe(final String topicName, Callback callback) {
         (new ReactTask(callback) {
             @Override
