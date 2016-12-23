@@ -65,8 +65,20 @@ export class Redis {
           reject(answ.error);
           return;
         }
-        resolve(answ.result)
-      })
+        resolve(answ.result);
+      });
+    });
+  }
+
+  static destroy() {
+    return new Promise((resolve, reject) => {
+      bridge.destroy(answ => {
+        if (answ.error) {
+          reject(answ.error);
+          return;
+        }
+        resolve(answ.result);
+      });
     });
   }
 
@@ -77,8 +89,8 @@ export class Redis {
           reject(answ.error);
           return;
         }
-        resolve(JSON.parse(answ.result || "null"))
-      })
+        resolve(JSON.parse(answ.result || "null"));
+      });
     });
   }
 
@@ -89,8 +101,8 @@ export class Redis {
           reject(answ.error);
           return;
         }
-        resolve(answ.result)
-      })
+        resolve(answ.result);
+      });
     });
   }
 
@@ -101,8 +113,8 @@ export class Redis {
           reject(answ.error);
           return;
         }
-        resolve(answ.result)
-      })
+        resolve(answ.result);
+      });
     });
   }
 
@@ -113,8 +125,8 @@ export class Redis {
           reject(answ.error);
           return;
         }
-        resolve(answ.result)
-      })
+        resolve(answ.result);
+      });
     });
   }
 
