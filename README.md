@@ -3,7 +3,7 @@ Redis client for React Native
 
 ## Installation
 
-### Automatic (works for iOS without condition; for Android with RN 0.28 and before)
+### Automatic (for Android with RN 0.28 and before)
 
 If you have rnpm installed, all you need to do is
 
