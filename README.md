@@ -34,7 +34,7 @@ in `MainApplication.java`
 add package to getPacakges()
 
 ```java
-import com.redislabs.redis.ReactNativeRedisPackage;
+import org.redislabs.rnredis.ReactNativeRedisPackage;
 
 // ...
 

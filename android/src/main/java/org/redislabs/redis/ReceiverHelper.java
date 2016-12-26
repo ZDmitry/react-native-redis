@@ -1,4 +1,4 @@
-package com.redislabs.redis;
+package org.redislabs.rnredis;
 
 import android.content.Context;
 import android.content.Intent;

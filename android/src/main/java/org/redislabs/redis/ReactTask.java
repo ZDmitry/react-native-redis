@@ -1,4 +1,4 @@
-package com.redislabs.redis;
+package org.redislabs.rnredis;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;

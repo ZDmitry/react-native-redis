@@ -1,4 +1,4 @@
-package com.redislabs.redis;
+package org.redislabs.rnredis;
 
 import java.util.HashMap;
 import java.lang.String;
