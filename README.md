@@ -52,8 +52,12 @@ Additionally multi dex support could be required.
 
 ##API
 
-`getContact` (Promise) - returns basic contact data as a JS object.  Currently returns name, first phone number and first email for contact.
-`getEmail` (Promise) - returns first email address (if found) for contact as string.
+`connect` (Promise) - preform connect to the Redis server
+`destroy` (Promise) - destroy redis client instance (optional)
+`saveObject` (Promise) - save object to redis storage
+`readObject` (Promise) - read object from redis storage
+`subscribe` (Promise) - subscribe for redis topic events
+`unsubscribe` (Promise) - undo redis topic subscription
 
 
 ##Usage
