@@ -33,7 +33,7 @@ dependencies {
 in `MainApplication.java`
 add package to getPacakges()
 
-```
+```java
 import com.redislabs.redis.ReactNativeRedisPackage;
 ...
 
@@ -72,7 +72,7 @@ Prevent methods from being called multiple times (on Android).
 
 ###Example
 
-```
+```javascript
 import { Redis } from 'react-native-redis';
 ...
     Redis.connect({
@@ -81,15 +81,17 @@ import { Redis } from 'react-native-redis';
         "database": 0
       }
     }).then(() => {
-      result = await Redis.saveObject('test1', {
+      Redis.saveObject('test1', {
         "val1": "test_text",
         "val2": 22
+      }).then((val) => {
+        console.log('redis.saveObject = ', val);
       });
-      console.log('redis.saveObject = ', result);
 
-      result = await Redis.readObject('test1');
-      console.log('redis.readObject = ', result);
-
+      Redis.readObject('test1').then((val) => {
+        console.log('redis.readObject = ', val);
+      });
+      
       Redis.subscribe('__keyspace@*__:*').then(() => {
         Redis.onNotification(msg => {
           if (msg.target && msg.action === 'set') {
