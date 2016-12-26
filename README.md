@@ -53,17 +53,17 @@ Additionally multi dex support could be required.
 
 ##API
 
-`connect` (Promise) - preform connect to the Redis server
+`connect(Object config)` (Promise) - preform connect to the Redis server
 
-`destroy` (Promise) - destroy redis client instance (optional)
+`destroy()` (Promise) - destroy redis client instance (optional)
 
-`saveObject` (Promise) - save object to redis storage
+`saveObject(String name, Object object)` (Promise) - save object to redis storage
 
-`readObject` (Promise) - read object from redis storage
+`readObject(String name)` (Promise) - read object from redis storage
 
-`subscribe` (Promise) - subscribe for redis topic events
+`subscribe(String topicName)` (Promise) - subscribe for redis topic events
 
-`unsubscribe` (Promise) - undo redis topic subscription
+`unsubscribe(String topicName)` (Promise) - undo redis topic subscription
 
 
 ##Usage
