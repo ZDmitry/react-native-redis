@@ -35,13 +35,14 @@ add package to getPacakges()
 
 ```java
 import com.redislabs.redis.ReactNativeRedisPackage;
-...
+
+// ...
 
 @Override
 protected List<ReactPackage> getPackages() {
     return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
-        ...,
+        // ... ,
         new ReactNativeRedisPackage()
    );
 }
@@ -74,32 +75,35 @@ Prevent methods from being called multiple times (on Android).
 
 ```javascript
 import { Redis } from 'react-native-redis';
-...
-    Redis.connect({
-      "singleServerConfig": {
-        "address": "redis://127.0.0.1:6379",
-        "database": 0
-      }
-    }).then(() => {
-      Redis.saveObject('test1', {
-        "val1": "test_text",
-        "val2": 22
-      }).then((val) => {
-        console.log('redis.saveObject = ', val);
-      });
 
-      Redis.readObject('test1').then((val) => {
-        console.log('redis.readObject = ', val);
-      });
-      
-      Redis.subscribe('__keyspace@*__:*').then(() => {
-        Redis.onNotification(msg => {
-          if (msg.target && msg.action === 'set') {
-            Redis.readObject(msg.target).then((newVal) => {
-              console.log('redis.event', msg, newVal);
-            })
-          }
-        });
-      });
+// ...
+
+Redis.connect({
+  "singleServerConfig": {
+    "address": "redis://127.0.0.1:6379",
+    "database": 0
+  }
+}).then(() => {
+  Redis.saveObject('test1', {
+    "val1": "test_text",
+    "val2": 22
+  }).then((val) => {
+    console.log('redis.saveObject = ', val);
+  });
+
+  Redis.readObject('test1').then((val) => {
+    console.log('redis.readObject = ', val);
+  });
+  
+  Redis.subscribe('__keyspace@*__:*').then(() => {
+    Redis.onNotification(msg => {
+      if (msg.target && msg.action === 'set') {
+        Redis.readObject(msg.target).then((newVal) => {
+          console.log('redis.event', msg, newVal);
+        })
+      }
     });
+  });
+});
+
 ```
