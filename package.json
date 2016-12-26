@@ -10,7 +10,7 @@
   "engines": {
     "npm": "^2.0.0"
   },
-  "license": "BSD",
+  "license": "MIT",
   "keywords": [
     "react-component",
     "react-native",
