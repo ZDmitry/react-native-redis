@@ -42,7 +42,7 @@ export class Redis {
 
   static readObject(key) {
     return new Promise((resolve, reject) => {
-      bridge.readObject(key, answ => {
+      Core.bridge.readObject(key, answ => {
         if (!answ) {
           reject(new RedisNoAnswerError());
           return;
