@@ -22,7 +22,7 @@ export class Redis {
   }
 
   static destroy() {
-    Core.notificationListeners.clear();
+    Core.notificationListeners.splice(0, Core.notificationListeners.length);
     return new Promise((resolve, reject) => {
       Core.bridge.destroy(answ => {
         if (!answ) {
