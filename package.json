@@ -2,7 +2,7 @@
   "name": "react-native-redis",
   "version": "0.0.1",
   "description": "React Native module for Redis client platforms: Android",
-  "main": "index.js",
+  "main": "js/index.js",
   "homepage": "https://github.com/zdmitry/react-native-redis#readme",
   "author":   "ZDmitry",
   "dependencies": {
