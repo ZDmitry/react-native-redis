@@ -3,106 +3,46 @@ package org.redislabs.rnredis;
 import java.util.HashMap;
 import java.lang.String;
 import java.lang.Boolean;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
-
-import org.redisson.Redisson;
-import org.redisson.client.codec.StringCodec;
-import org.redisson.config.Config;
-
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
-import org.redisson.api.RPatternTopic;
-
-import org.redisson.api.listener.PatternMessageListener;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 
 
 class ReactNativeRedis extends ReactContextBaseJavaModule {
 
-    private RedissonClient       redisson       = null;
-    private Map<String, Integer> topicListeners = new HashMap<>();
+    private Map<String, Object> _storage;
 
     ReactNativeRedis(final ReactApplicationContext reactContext) {
         super(reactContext);
+        _storage = new HashMap<>();
     }
 
-    private Boolean _init(final String jsonConfig) throws Exception {
-        if (redisson == null) {
-            Config config = Config.fromJSON(jsonConfig);
-            config.setCodec(new StringCodec());
-            redisson = Redisson.create(config);
-        }
-        return true;
+    private String _newObject(Object obj) {
+        UUID uuid = UUID.randomUUID();
+        _storage.put(uuid.toString(), obj);
+        return uuid.toString();
     }
 
-    private Boolean _destroy() throws Exception {
-        if (redisson != null) {
-            Iterator it = topicListeners.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                RPatternTopic<String> topic = redisson.getPatternTopic((String)pair.getKey());
-                if (topic != null) {
-                    topic.removeListener((Integer)pair.getValue());
-                }
-                it.remove();
-            }
-            topicListeners.clear();
+    @SuppressWarnings("unchecked")
+    private <T> T _getObject(final String uuid) throws Exception {
+        if (!_storage.containsKey(uuid)) {
+            throw new ReactException("ENULLPTR", "No such object with key \"" + uuid + "\"");
         }
-
-        redisson = null;
-        return true;
+        return (T) _storage.get(uuid);
     }
 
-    private <T> Object _getBucket(final String key) throws Exception {
-        if (redisson == null) {
-            throw new Exception("Redis client not initialized");
-        }
-
-        RBucket<T> bucket = redisson.getBucket(key);
-        return bucket.get();
-    }
-
-    private <T> Boolean _setBucket(final String key, final T obj) throws Exception {
-        if (redisson == null) {
-            throw new Exception("Redis client not initialized");
-        }
-
-        RBucket<T> bucket = redisson.getBucket(key);
-        return bucket.trySet(obj);
-    }
-
-    @SuppressWarnings("unused")
-    private <T> Boolean _topicSubscribe(final String topicName, final PatternMessageListener<T> listener) throws Exception {
-        if (redisson == null) {
-            throw new Exception("Redis client not initialized");
-        }
-
-        Integer listenerId = topicListeners.get(topicName);
-
-        RPatternTopic<T> topic = redisson.getPatternTopic(topicName);
-        int topicId = topic.addListener(listener);
-
-        topicListeners.put(topicName, topicId);
-        return true;
-    }
-
-    private <T> Boolean _topicUnsubscribe(final String topicName) throws Exception {
-        if (ReactNativeRedis.this.redisson == null) {
-            throw new Exception("Redis client not initialized");
-        }
-
-        Integer listenerId = topicListeners.get(topicName);
-        if (listenerId != null) {
-            RPatternTopic<T> topic = redisson.getPatternTopic(topicName);
-            topic.removeListener(listenerId);
+    private Boolean _delObject(final String uuid) {
+        if (_storage.containsKey(uuid)) {
+            _storage.remove(uuid);
             return true;
         }
-
         return false;
     }
 
@@ -113,23 +53,34 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     @ReactMethod
     @SuppressWarnings("unused")
-    public void init(final String config, Callback callback) {
+    public void connect(final String config, final Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                ReactNativeRedis.this._init(config);
-                return this._successResult(true);
+                RNRedisClient client = new RNRedisClient(config);
+                String uuid = ReactNativeRedis.this._newObject(client);
+
+                WritableMap metaMap = Arguments.createMap();
+
+                metaMap.putString("uuid", uuid);
+                metaMap.putArray("address", client.address());
+                metaMap.putInt("dbIndex", client.dbIndex());
+
+                return metaMap;
             }
         }).start();
     }
 
     @ReactMethod
     @SuppressWarnings("unused")
-    public void destroy(Callback callback) {
+    public void destroy(final String uuid, Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                Boolean success = ReactNativeRedis.this._destroy();
+                RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
+                client.destroy();
+
+                Boolean success = ReactNativeRedis.this._delObject(uuid);
                 return this._successResult(success);
             }
         }).start();
@@ -137,22 +88,37 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     @ReactMethod
     @SuppressWarnings("unused")
-    public void readObject(final String key, Callback callback) {
+    public void readObject(final String uuid, final String key, Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                return ReactNativeRedis.this._getBucket(key);
+                RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
+                return client.getBucket(key);
             }
-        }).start();
+        }).startAsync();
     }
 
     @ReactMethod
     @SuppressWarnings("unused")
-    public void saveObject(final String key, final String jsonObj, Callback callback) {
+    public void saveObject(final String uuid, final String key, final String jsonObj, Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                Boolean success = ReactNativeRedis.this._setBucket(key, jsonObj);
+                RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
+                Boolean success = client.setBucket(key, jsonObj);
+                return this._successResult(success);
+            }
+        }).startAsync();
+    }
+
+    @ReactMethod
+    @SuppressWarnings("unused")
+    public void subscribe(final String uuid, final String topicName, Callback callback) {
+        (new ReactTask(callback) {
+            @Override
+            Object run() throws Exception {
+                RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
+                Boolean success = client.topicSubscribe(topicName, TopicListener.create(uuid));
                 return this._successResult(success);
             }
         }).start();
@@ -160,23 +126,12 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     @ReactMethod
     @SuppressWarnings("unused")
-    public void subscribe(final String topicName, Callback callback) {
+    public void unsubscribe(final String uuid, final String topicName, Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
-                Boolean success = ReactNativeRedis.this._topicSubscribe(topicName, TopicListener.create());
-                return this._successResult(success);
-            }
-        }).start();
-    }
-
-    @ReactMethod
-    @SuppressWarnings("unused")
-    public void unsubscribe(final String topicName, Callback callback) {
-        (new ReactTask(callback) {
-            @Override
-            Object run() throws Exception {
-                Boolean success = ReactNativeRedis.this.<String>_topicUnsubscribe(topicName);
+                RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
+                Boolean success = client.<String>topicUnsubscribe(topicName);
                 return this._successResult(success);
             }
         }).start();

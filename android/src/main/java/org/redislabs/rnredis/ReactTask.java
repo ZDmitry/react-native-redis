@@ -1,15 +1,23 @@
 package org.redislabs.rnredis;
 
+import android.os.AsyncTask;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.WritableMap;
 
 
-abstract class ReactTask {
+abstract class ReactTask extends AsyncTask<Object, Void, Object> {
     private Callback _callback = null;
 
     ReactTask(Callback callback) {
         _callback = callback;
+    }
+
+    @Override
+    protected Object doInBackground(Object... params) {
+        this.start();
+        return null;
     }
 
     abstract Object run() throws Exception;
@@ -19,8 +27,20 @@ abstract class ReactTask {
             Object result = this.run();
             this._returnJSResult(this._callback, result);
         } catch (Exception e) {
-            this._raiseJSException(this._callback, "EINT", e.getMessage());
+            String      message = e.getMessage();
+            WritableMap details = Arguments.createMap();
+
+            if (e instanceof ReactException) {
+                ReactException re = (ReactException)e;
+                details = re.getDetails();
+            }
+
+            this._raiseJSException(this._callback, "ERNINT", message, details);
         }
+    }
+
+    void startAsync() {
+        this.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     Object _successResult(Boolean success) {

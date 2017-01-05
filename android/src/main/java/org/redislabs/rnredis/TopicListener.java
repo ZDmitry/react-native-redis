@@ -12,8 +12,10 @@ import org.redisson.api.listener.PatternMessageListener;
 
 class TopicListener {
 
-    static PatternMessageListener create() {
+    static PatternMessageListener create(final String uuid) {
         return (new PatternMessageListener<String> () {
+
+            private final String _uuid = uuid;
 
             @Override
             public void onMessage(String pattern, String channel, String msg) {
@@ -25,6 +27,7 @@ class TopicListener {
                 eventMap.putString("message", msg);
 
                 WritableMap returnMap = new WritableNativeMap();
+                returnMap.putString("uuid", _uuid);
                 returnMap.putMap("result", eventMap);
 
                 emitter.emit("redis.event", returnMap);
