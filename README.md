@@ -55,15 +55,15 @@ Additionally multi dex support could be required.
 
 `connect(Object config)` (Promise) - preform connect to the Redis server
 
-`destroy()` (Promise) - destroy redis client instance (optional)
+`client.destroy()` (Promise) - destroy redis client instance (optional)
 
-`saveObject(String name, Object object)` (Promise) - save object to redis storage
+`client.saveObject(String name, Object object)` (Promise) - save object to redis storage
 
-`readObject(String name)` (Promise) - read object from redis storage
+`client.readObject(String name)` (Promise) - read object from redis storage
 
-`subscribe(String topicName)` (Promise) - subscribe for redis topic events
+`client.subscribe(String topicName)` (Promise) - subscribe for redis topic events
 
-`unsubscribe(String topicName)` (Promise) - undo redis topic subscription
+`client.unsubscribe(String topicName)` (Promise) - undo redis topic subscription
 
 
 ##Usage
@@ -83,26 +83,28 @@ Redis.connect({
     "address": "redis://127.0.0.1:6379",
     "database": 0
   }
-}).then(() => {
-  Redis.saveObject('test1', {
+}).then((client) => {
+  client.saveObject('test1', {
     "val1": "test_text",
     "val2": 22
   }).then((val) => {
     console.log('redis.saveObject = ', val);
   });
 
-  Redis.readObject('test1').then((val) => {
+  client.readObject('test1').then((val) => {
     console.log('redis.readObject = ', val);
   });
   
-  Redis.subscribe('__keyspace@*__:*').then(() => {
-    Redis.onNotification(msg => {
-      if (msg.target && msg.action === 'set') {
-        Redis.readObject(msg.target).then((newVal) => {
-          console.log('redis.event', msg, newVal);
-        })
-      }
-    });
+  client.listen(msg => {
+    if (msg.target && msg.action === 'set') {
+      client.readObject(msg.target).then((newVal) => {
+        console.log('redis.event', msg, newVal);
+      })
+    }
+  });
+
+  client.subscribe('__keyspace@*__:*').then(() => {
+    // ...
   });
 });
 
