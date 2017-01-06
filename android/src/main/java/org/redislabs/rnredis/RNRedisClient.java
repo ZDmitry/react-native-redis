@@ -32,6 +32,12 @@ class RNRedisClient {
         _client = Redisson.create(config);
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        destroy();
+        super.finalize();
+    }
+
     private RedissonClient client() throws Exception {
         if (_client == null) {
             throw new ReactException("ENINIT", "Redis client not initialized");
@@ -78,7 +84,6 @@ class RNRedisClient {
                 }
                 it.remove();
             }
-            _listeners.clear();
             return true;
         }
 

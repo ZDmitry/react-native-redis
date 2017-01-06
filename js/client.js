@@ -44,6 +44,12 @@ export class RedisClient {
     this._dbId = (-1);
   }
 
+  listen(listener) {
+    if (typeof listener === "function") {
+      this._listeners.push(listener);
+    }
+  }
+
   _onNotification(notification) {
     let keySpaceMsg = this._keySpaceNotificationTransform(notification);
 

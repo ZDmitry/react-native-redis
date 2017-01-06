@@ -1,17 +1,18 @@
 package org.redislabs.rnredis;
 
-import java.util.HashMap;
 import java.lang.String;
 import java.lang.Boolean;
+
 import java.util.Map;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
 
@@ -22,6 +23,28 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     ReactNativeRedis(final ReactApplicationContext reactContext) {
         super(reactContext);
         _storage = new HashMap<>();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        _destroy();
+        super.finalize();
+    }
+
+    void _destroy() {
+        Iterator it = _storage.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            RNRedisClient client = (RNRedisClient)pair.getValue();
+
+            try {
+                client.destroy();
+            } catch(Throwable e) {
+                // ...
+            } finally {
+                it.remove();
+            }
+        }
     }
 
     private String _newObject(Object obj) {
