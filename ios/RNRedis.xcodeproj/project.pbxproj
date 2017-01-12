@@ -14,6 +14,7 @@
 		0D1145EA1E27CA74004B94B9 /* read.c in Sources */ = {isa = PBXBuildFile; fileRef = 0D1145E21E27CA74004B94B9 /* read.c */; };
 		0D1145EB1E27CA74004B94B9 /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 0D1145E41E27CA74004B94B9 /* sds.c */; };
 		0D1145F11E27CE62004B94B9 /* RNReactTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D1145F01E27CE62004B94B9 /* RNReactTask.m */; };
+		0D1145F41E27DEEC004B94B9 /* RNRedisClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D1145F31E27DEEC004B94B9 /* RNRedisClient.m */; };
 		0DB870031E1FF088006D8315 /* RNRedisManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB870021E1FF088006D8315 /* RNRedisManager.m */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,8 @@
 		0D1145EE1E27CB59004B94B9 /* sdsalloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sdsalloc.h; path = hiredis/sdsalloc.h; sourceTree = "<group>"; };
 		0D1145EF1E27CE62004B94B9 /* RNReactTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNReactTask.h; sourceTree = "<group>"; };
 		0D1145F01E27CE62004B94B9 /* RNReactTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNReactTask.m; sourceTree = "<group>"; };
+		0D1145F21E27DEEC004B94B9 /* RNRedisClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNRedisClient.h; sourceTree = "<group>"; };
+		0D1145F31E27DEEC004B94B9 /* RNRedisClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNRedisClient.m; sourceTree = "<group>"; };
 		0DB870011E1FF088006D8315 /* RNRedisManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNRedisManager.h; sourceTree = "<group>"; };
 		0DB870021E1FF088006D8315 /* RNRedisManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNRedisManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -68,6 +71,8 @@
 				0D1145D31E27C986004B94B9 /* hiredis */,
 				0DB870011E1FF088006D8315 /* RNRedisManager.h */,
 				0DB870021E1FF088006D8315 /* RNRedisManager.m */,
+				0D1145F21E27DEEC004B94B9 /* RNRedisClient.h */,
+				0D1145F31E27DEEC004B94B9 /* RNRedisClient.m */,
 				0D1145EF1E27CE62004B94B9 /* RNReactTask.h */,
 				0D1145F01E27CE62004B94B9 /* RNReactTask.m */,
 				0CF68AC21AF0540F00FF9E5C /* Products */,
@@ -160,6 +165,7 @@
 			files = (
 				0D1145E71E27CA74004B94B9 /* dict.c in Sources */,
 				0D1145E61E27CA74004B94B9 /* async.c in Sources */,
+				0D1145F41E27DEEC004B94B9 /* RNRedisClient.m in Sources */,
 				0D1145F11E27CE62004B94B9 /* RNReactTask.m in Sources */,
 				0D1145E81E27CA74004B94B9 /* hiredis.c in Sources */,
 				0DB870031E1FF088006D8315 /* RNRedisManager.m in Sources */,
