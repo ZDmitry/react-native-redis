@@ -67,9 +67,10 @@ export class RedisClient {
       let eventName = msg.event || '';
       if (eventName.startsWith('__keyspace@')) {
         eventName   = eventName.slice('__keyspace@'.length);
+        let parts   = eventName.split(':');
 
-        let dbName  = eventName.split(':')[0];
-        let varName = eventName.split(':')[1];
+        let dbName  = parts[0];
+        let varName = parts.slice(1).join(':');
 
         dbName = dbName[0];
 
