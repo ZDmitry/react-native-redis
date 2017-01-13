@@ -111,6 +111,18 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     @ReactMethod
     @SuppressWarnings("unused")
+    public void readAllObjects(final String uuid, final String key, Callback callback) {
+        (new ReactTask(callback) {
+            @Override
+            Object run() throws Exception {
+                RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
+                return client.getAllObjects();
+            }
+        }).startAsync();
+    }
+
+    @ReactMethod
+    @SuppressWarnings("unused")
     public void readObject(final String uuid, final String key, Callback callback) {
         (new ReactTask(callback) {
             @Override

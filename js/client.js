@@ -102,6 +102,38 @@ export class RedisClient {
     });
   }
 
+
+  readAllObjects() {
+    return new Promise((resolve, reject) => {
+      this._bridge.readAllObjects(this._uuid, key, answ => {
+        if (!answ) {
+          reject(new RedisNoAnswerError());
+          return;
+        }
+
+        if (answ.error) {
+          reject(new RedisError(answ.error));
+          return;
+        }
+
+        if (typeof answ.result === 'string') {
+          resolve(JSON.parse(answ.result || "null"));
+        }
+
+        let keys = Object.keys(answ.result);
+        let all  = keys.map(k => {
+          let obj = answ.result[k];
+          if (typeof obj === 'string') {
+            return JSON.parse(obj || "null");
+          }
+          return obj;
+        });
+
+        resolve(all);
+      });
+    });
+  }
+
   readObject(key) {
     return new Promise((resolve, reject) => {
       this._bridge.readObject(this._uuid, key, answ => {

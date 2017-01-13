@@ -2,10 +2,12 @@ package org.redislabs.rnredis;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 
 import org.redisson.Redisson;
 
 import org.redisson.api.RBucket;
+import org.redisson.api.RBuckets;
 import org.redisson.api.RPatternTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.listener.PatternMessageListener;
@@ -89,6 +91,20 @@ class RNRedisClient {
 
         _client = null;
         return false;
+    }
+
+    WritableMap getAllObjects() throws Exception {
+        WritableMap dbDump = Arguments.createMap();
+
+        RBuckets buckets = _client.getBuckets();
+        List list = buckets.find("*");
+
+        for (Object item : list) {
+            RBucket bucket = (RBucket)item;
+            dbDump.putString(bucket.getName(), (String)bucket.get());
+        }
+
+        return dbDump;
     }
 
     <T> Object getBucket(final String key) throws Exception {
