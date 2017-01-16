@@ -111,7 +111,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     @ReactMethod
     @SuppressWarnings("unused")
-    public void readAllObjects(final String uuid, final String key, Callback callback) {
+    public void readAllObjects(final String uuid, Callback callback) {
         (new ReactTask(callback) {
             @Override
             Object run() throws Exception {
