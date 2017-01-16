@@ -120,13 +120,15 @@ export class RedisClient {
           resolve(JSON.parse(answ.result || "null"));
         }
 
+        let all  = {};
         let keys = Object.keys(answ.result);
-        let all  = keys.map(k => {
+
+        keys.forEach(k => {
           let obj = answ.result[k];
           if (typeof obj === 'string') {
-            return JSON.parse(obj || "null");
+            obj = JSON.parse(obj || "null");
           }
-          return obj;
+          all[k] = obj;
         });
 
         resolve(all);
