@@ -4,7 +4,7 @@ export class RedisError extends BaseClass(Error) {
   constructor(details, object) {
     super('Redis internal error');
 
-    this.name    = this.constructor.name;
+    this.name    = "RedisError";
     this.details = details;
     this.object  = object;
 
