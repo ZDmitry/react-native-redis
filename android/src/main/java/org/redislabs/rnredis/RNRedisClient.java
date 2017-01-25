@@ -103,11 +103,11 @@ class RNRedisClient {
         RBuckets buckets = _client.getBuckets();
         List list = buckets.find("*");
 
+        if (firstIndex >= list.size()) firstIndex = list.size() - 1;
+        if (lastIndex  >  list.size()) lastIndex  = list.size();
+
         if (firstIndex < 0) firstIndex = 0;
         if (lastIndex  < 0) lastIndex  = list.size();
-
-        if (firstIndex > list.size()) firstIndex = list.size();
-        if (lastIndex  > list.size()) lastIndex  = list.size();
 
         List sublist = list.subList(firstIndex, lastIndex);
 
