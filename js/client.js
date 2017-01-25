@@ -104,7 +104,7 @@ export class RedisClient {
 
   readObjects(firstIdx, lastIdx) {
     return new Promise((resolve, reject) => {
-      this._bridge.readObjects(firstIdx, lastIdx, answ => {
+      this._bridge.readObjects(this._uuid, firstIdx, lastIdx, answ => {
         if (!answ) {
           reject(new RedisNoAnswerError());
           return;
