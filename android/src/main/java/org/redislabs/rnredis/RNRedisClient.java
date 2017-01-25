@@ -93,13 +93,25 @@ class RNRedisClient {
         return false;
     }
 
-    WritableMap getAllObjects() throws Exception {
+    WritableMap getObjects() throws Exception {
+        return this.getObjects((-1), (-1));
+    }
+
+    WritableMap getObjects(int firstIndex, int lastIndex) throws Exception {
         WritableMap dbDump = Arguments.createMap();
 
         RBuckets buckets = _client.getBuckets();
         List list = buckets.find("*");
 
-        for (Object item : list) {
+        if (firstIndex < 0) firstIndex = 0;
+        if (lastIndex  < 0) lastIndex  = list.size();
+
+        if (firstIndex > list.size()) firstIndex = list.size();
+        if (lastIndex  > list.size()) lastIndex  = list.size();
+
+        List sublist = list.subList(firstIndex, lastIndex);
+
+        for (Object item : sublist) {
             RBucket bucket = (RBucket)item;
             dbDump.putString(bucket.getName(), (String)bucket.get());
         }

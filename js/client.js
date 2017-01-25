@@ -102,6 +102,39 @@ export class RedisClient {
     });
   }
 
+  readObjects(firstIdx, lastIdx) {
+    return new Promise((resolve, reject) => {
+      this._bridge.readObjects(firstIdx, lastIdx, answ => {
+        if (!answ) {
+          reject(new RedisNoAnswerError());
+          return;
+        }
+
+        if (answ.error) {
+          reject(new RedisError(answ.error));
+          return;
+        }
+
+        if (typeof answ.result === 'string') {
+          resolve(JSON.parse(answ.result || "null"));
+        }
+
+        let all  = {};
+        let keys = Object.keys(answ.result);
+
+        keys.forEach(k => {
+          let obj = answ.result[k];
+          if (typeof obj === 'string') {
+            obj = JSON.parse(obj || "null");
+          }
+          all[k] = obj;
+        });
+
+        resolve(all);
+      });
+    });
+  }
+
 
   readAllObjects() {
     return new Promise((resolve, reject) => {
