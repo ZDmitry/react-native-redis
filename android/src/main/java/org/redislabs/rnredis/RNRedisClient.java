@@ -122,7 +122,7 @@ class RNRedisClient {
     }
 
     <T> Object getBucket(final String key) throws Exception {
-        RBucket<T> bucket = _client.getBucket(key);
+        RBucket<T> bucket = client().getBucket(key);
         return bucket.get();
     }
 
