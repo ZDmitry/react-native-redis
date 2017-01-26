@@ -64,7 +64,8 @@ abstract class ReactTask extends AsyncTask<Object, Void, WritableMap> {
     @Override
     protected void onCancelled() {
         if (!_context.getCatalystInstance().isDestroyed()) {
-            _callback.invoke();
+            WritableMap msg = this._raiseJSException("ERNINT", "Interrupted");
+            _callback.invoke(msg);
         }
     }
 
