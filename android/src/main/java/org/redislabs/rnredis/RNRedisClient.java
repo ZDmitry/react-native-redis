@@ -93,11 +93,11 @@ class RNRedisClient {
         return false;
     }
 
-    WritableMap getObjects() throws Exception {
-        return this.getObjects((-1), (-1));
+    WritableMap getObjects(ReactTask task) throws Exception {
+        return this.getObjects(task, (-1), (-1));
     }
 
-    WritableMap getObjects(int firstIndex, int lastIndex) throws Exception {
+    WritableMap getObjects(ReactTask task, int firstIndex, int lastIndex) throws Exception {
         WritableMap dbDump = Arguments.createMap();
 
         RBuckets buckets = _client.getBuckets();
@@ -112,6 +112,8 @@ class RNRedisClient {
         List sublist = list.subList(firstIndex, lastIndex);
 
         for (Object item : sublist) {
+            if (task.isCancelled()) return dbDump;
+
             RBucket bucket = (RBucket)item;
             dbDump.putString(bucket.getName(), (String)bucket.get());
         }
