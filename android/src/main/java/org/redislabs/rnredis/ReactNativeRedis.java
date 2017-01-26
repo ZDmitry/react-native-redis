@@ -18,6 +18,8 @@ import com.facebook.react.bridge.WritableMap;
 
 class ReactNativeRedis extends ReactContextBaseJavaModule {
 
+    static final String TAG = "ReactNativeRedis";
+
     private Map<String, Object>    _storage  = new HashMap<>();
     private Map<String, ReactTask> _cmdQueue = new HashMap<>();
 
@@ -195,7 +197,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     @ReactMethod
     @SuppressWarnings("unused")
     public void readObject(final String uuid, final String key, Callback callback) {
-        final String cmdName = uuid + ":readObject";
+        final String cmdName = uuid + ":readObject:" + key;
         cancelCommand(cmdName);
 
         ReactTask task = (new ReactTask(getReactApplicationContext(), callback) {
@@ -203,7 +205,8 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
             Object run() throws Exception {
                 RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
                 return client.getBucket(key);
-            }            @Override
+            }
+            @Override
             void finish() {
                 ReactNativeRedis.this.removeCommand(cmdName);
             }
@@ -215,7 +218,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
     @ReactMethod
     @SuppressWarnings("unused")
     public void saveObject(final String uuid, final String key, final String jsonObj, Callback callback) {
-        final String cmdName = uuid + ":saveObject";
+        final String cmdName = uuid + ":saveObject:" + key;
         cancelCommand(cmdName);
 
         ReactTask task = (new ReactTask(getReactApplicationContext(), callback) {

@@ -100,7 +100,7 @@ class RNRedisClient {
     WritableMap getObjects(ReactTask task, int firstIndex, int lastIndex) throws Exception {
         WritableMap dbDump = Arguments.createMap();
 
-        RBuckets buckets = _client.getBuckets();
+        RBuckets buckets = client().getBuckets();
         List list = buckets.find("*");
 
         if (firstIndex >= list.size()) firstIndex = list.size() - 1;

@@ -30,10 +30,10 @@ abstract class ReactTask extends AsyncTask<Object, Void, WritableMap> {
     abstract void finish();
 
     WritableMap start() {
-        WritableMap jsResuilt;
+        WritableMap jsResult;
         try {
             Object result = this.run();
-            jsResuilt = this._returnJSResult(result);
+            jsResult = this._returnJSResult(result);
         } catch (Exception e) {
             String      message = e.getMessage();
             WritableMap details = Arguments.createMap();
@@ -44,14 +44,14 @@ abstract class ReactTask extends AsyncTask<Object, Void, WritableMap> {
             }
 
             Log.d(TAG, message);
-            jsResuilt = this._raiseJSException("ERNINT", message, details);
+            jsResult = this._raiseJSException("ERNINT", message, details);
         } finally {
             if (!isCancelled()) {
                 finish();
             }
         }
 
-        return jsResuilt;
+        return jsResult;
     }
 
     @Override
