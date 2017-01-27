@@ -154,6 +154,27 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
 
     @ReactMethod
     @SuppressWarnings("unused")
+    public void objectsCount(final String uuid, Callback callback) {
+        final String cmdName = uuid + ":objectsCount";
+        cancelCommand(cmdName);
+
+        ReactTask task = (new ReactTask(getReactApplicationContext(), callback) {
+            @Override
+            Object run() throws Exception {
+                RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
+                return client.getObjectCount();
+            }
+            @Override
+            void finish() {
+                ReactNativeRedis.this.removeCommand(cmdName);
+            }
+        }).startAsync();
+
+        _cmdQueue.put(cmdName, task);
+    }
+
+    @ReactMethod
+    @SuppressWarnings("unused")
     public void readObjects(final String uuid, final Integer firstIdx, final Integer lastIdx, Callback callback) {
         final String cmdName = uuid + ":readObjects";
         cancelCommand(cmdName);

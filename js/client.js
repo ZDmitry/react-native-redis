@@ -102,6 +102,23 @@ export class RedisClient {
     });
   }
 
+  objectsCount() {
+    return new Promise((resolve, reject) => {
+      this._bridge.objectsCount(this._uuid, answ => {
+        if (!answ) {
+          return 0;
+        }
+
+        if (answ.error) {
+          reject(new RedisError(answ.error));
+          return;
+        }
+
+        return (answ.result || 0);
+      });
+    });
+  }
+
   readObjects(firstIdx, lastIdx) {
     return new Promise((resolve, reject) => {
       this._bridge.readObjects(this._uuid, firstIdx, lastIdx, answ => {

@@ -8,6 +8,7 @@ import org.redisson.Redisson;
 
 import org.redisson.api.RBucket;
 import org.redisson.api.RBuckets;
+import org.redisson.api.RKeys;
 import org.redisson.api.RPatternTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.listener.PatternMessageListener;
@@ -91,6 +92,14 @@ class RNRedisClient {
 
         _client = null;
         return false;
+    }
+
+    long getObjectCount() throws Exception {
+        RKeys keys = client().getKeys();
+        if (keys != null) {
+            return keys.count();
+        }
+        return (0);
     }
 
     WritableMap getObjects(ReactTask task) throws Exception {
