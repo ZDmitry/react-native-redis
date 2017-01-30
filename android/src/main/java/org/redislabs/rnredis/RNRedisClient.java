@@ -114,14 +114,7 @@ class RNRedisClient {
         RBuckets buckets = client().getBuckets();
         List list = buckets.find("*");
 
-        if (firstIndex >= list.size()) firstIndex = list.size() - 1;
-        if (lastIndex  >  list.size()) lastIndex  = list.size();
-
-        if (firstIndex < 0) firstIndex = 0;
-        if (lastIndex  < 0) lastIndex  = list.size();
-
-        List sublist = list.subList(firstIndex, lastIndex);
-        Collections.sort(sublist, new Comparator() {
+        Collections.sort(list, new Comparator() {
             @Override
             public int compare(Object lho, Object rho) {
                 RBucket left  = (RBucket)lho;
@@ -129,6 +122,14 @@ class RNRedisClient {
                 return left.getName().compareTo(right.getName());
             }
         });
+
+        if (firstIndex >= list.size()) firstIndex = list.size() - 1;
+        if (lastIndex  >  list.size()) lastIndex  = list.size();
+
+        if (firstIndex < 0) firstIndex = 0;
+        if (lastIndex  < 0) lastIndex  = list.size();
+
+        List sublist = list.subList(firstIndex, lastIndex);
 
         for (Object item : sublist) {
             if (task.isCancelled()) return dbDump;
