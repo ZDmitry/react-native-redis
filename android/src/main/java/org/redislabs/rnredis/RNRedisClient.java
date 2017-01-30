@@ -18,6 +18,8 @@ import org.redisson.config.Config;
 
 import java.net.URL;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -119,6 +121,14 @@ class RNRedisClient {
         if (lastIndex  < 0) lastIndex  = list.size();
 
         List sublist = list.subList(firstIndex, lastIndex);
+        Collections.sort(sublist, new Comparator() {
+            @Override
+            public int compare(Object lho, Object rho) {
+                RBucket left  = (RBucket)lho;
+                RBucket right = (RBucket)rho;
+                return left.getName().compareTo(right.getName());
+            }
+        });
 
         for (Object item : sublist) {
             if (task.isCancelled()) return dbDump;

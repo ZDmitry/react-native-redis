@@ -162,7 +162,7 @@ class ReactNativeRedis extends ReactContextBaseJavaModule {
             @Override
             Object run() throws Exception {
                 RNRedisClient client = ReactNativeRedis.this._getObject(uuid);
-                return client.getObjectCount();
+                return Integer.valueOf((int)client.getObjectCount());
             }
             @Override
             void finish() {
