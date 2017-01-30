@@ -106,7 +106,8 @@ export class RedisClient {
     return new Promise((resolve, reject) => {
       this._bridge.objectsCount(this._uuid, answ => {
         if (!answ) {
-          return 0;
+          resolve(0);
+          return;
         }
 
         if (answ.error) {
@@ -114,7 +115,7 @@ export class RedisClient {
           return;
         }
 
-        return (answ.result || 0);
+        resolve(answ.result || 0);
       });
     });
   }
