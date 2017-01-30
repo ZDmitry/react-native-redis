@@ -119,6 +119,18 @@ export class RedisClient {
     });
   }
 
+  _tryParseObject(strObj) {
+    try {
+      if (typeof strObj=== 'string') {
+        return JSON.parse(strObj|| "null");
+      } else {
+        return strObj;
+      }
+    } catch (e) {
+      return strObj
+    }
+  }
+
   readObjects(firstIdx, lastIdx) {
     return new Promise((resolve, reject) => {
       this._bridge.readObjects(this._uuid, firstIdx, lastIdx, answ => {
@@ -133,18 +145,14 @@ export class RedisClient {
         }
 
         if (typeof answ.result === 'string') {
-          resolve(JSON.parse(answ.result || "null"));
+          resolve(this._tryParseObject(answ.result));
         }
 
         let all  = {};
         let keys = Object.keys(answ.result);
 
         keys.forEach(k => {
-          let obj = answ.result[k];
-          if (typeof obj === 'string') {
-            obj = JSON.parse(obj || "null");
-          }
-          all[k] = obj;
+          all[k] = this._tryParseObject(answ.result[k]);
         });
 
         resolve(all);
@@ -167,18 +175,14 @@ export class RedisClient {
         }
 
         if (typeof answ.result === 'string') {
-          resolve(JSON.parse(answ.result || "null"));
+          resolve(this._tryParseObject(answ.result));
         }
 
         let all  = {};
         let keys = Object.keys(answ.result);
 
         keys.forEach(k => {
-          let obj = answ.result[k];
-          if (typeof obj === 'string') {
-            obj = JSON.parse(obj || "null");
-          }
-          all[k] = obj;
+          all[k] = this._tryParseObject(answ.result[k]);
         });
 
         resolve(all);
@@ -199,7 +203,7 @@ export class RedisClient {
           return;
         }
 
-        resolve(JSON.parse(answ.result || "null"));
+        resolve(this._tryParseObject(answ.result));
       });
     });
   }
