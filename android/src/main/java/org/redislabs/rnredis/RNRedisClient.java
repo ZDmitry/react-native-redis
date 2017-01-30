@@ -89,6 +89,9 @@ class RNRedisClient {
                 }
                 it.remove();
             }
+
+            _client.shutdown();
+            _client = null;
             return true;
         }
 
